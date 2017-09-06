@@ -1,6 +1,6 @@
 package com.company.Client;
 
-import java.nio.ByteBuffer;
+import com.company.Data.Request;
 
 public class SendRequestThread extends Thread {
     private boolean isWork = true;
@@ -17,10 +17,8 @@ public class SendRequestThread extends Thread {
     @Override
     public void run() {
         Client client = Client.getInstance();
-        byte[] data;
         while (isWork) {
-            data = ByteBuffer.allocate(4).putInt(id).array();
-            client.send(data);
+            client.updateQueue(new Request());
         }
     }
 }
