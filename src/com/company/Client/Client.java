@@ -12,7 +12,7 @@ import java.util.List;
 public class Client {
     private final int PORT = 7777;
     private final String IP = "127.0.0.1";
-    private static Client instance;
+    private static volatile Client instance;
 
     private Socket clientSocket = null;
     private List<Request> queue = new ArrayList<>();
