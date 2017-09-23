@@ -11,6 +11,7 @@ public class Server {
 
     public Server() {
         try {
+            System.out.println("Server is starting...");
             serverSocket = new ServerSocket(PORT);
             serverWorkThread = new ServerWorkThread(serverSocket);
         } catch (IOException e) {
