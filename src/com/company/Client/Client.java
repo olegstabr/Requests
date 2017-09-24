@@ -11,16 +11,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Client {
+class Client {
     private final int PORT = 7777;
     private final String IP = "127.0.0.1";
     private static volatile Client instance;
 
     private Socket clientSocket = null;
     private List<Request> queue = Collections.synchronizedList(new ArrayList<>());
-    private Object lockObject = new Object();
 
-    Client() {
+    private Client() {
         try {
             clientSocket = new Socket(IP, PORT);
         } catch (IOException e) {
@@ -28,19 +27,18 @@ public class Client {
         }
     }
 
-    public void send() {
+    void send() {
         ReentrantLock locker = new ReentrantLock();
         try {
             boolean lockFlag = locker.tryLock(100, TimeUnit.MILLISECONDS);
             if (lockFlag) {
                 try {
+                    BufferedOutputStream outputStream = new BufferedOutputStream(clientSocket.getOutputStream());
+
                     while (!queue.isEmpty()) {
-                        int queueLength = queue.size();
-                        Request request = queue.get(queueLength - 1);
+                        Request request = queue.get(0);
                         byte[] data = request.getBytes();
                         int value = request.getId();
-
-                        BufferedOutputStream outputStream = new BufferedOutputStream(clientSocket.getOutputStream());
                         outputStream.write(data);
                         outputStream.flush();
 
@@ -51,9 +49,7 @@ public class Client {
                     locker.unlock();
                 }
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -71,10 +67,10 @@ public class Client {
 
     }
 
-
     //
     // Singleton
     //
+
     static Client getInstance() {
         Client localInstance = instance;
         if (localInstance == null) {

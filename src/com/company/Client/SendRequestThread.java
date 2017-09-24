@@ -7,6 +7,10 @@ public class SendRequestThread extends Thread {
 
     public SendRequestThread() { }
 
+    public void sleep() {
+        isWork = false;
+    }
+
     @Override
     public void run() {
         Client client = Client.getInstance();

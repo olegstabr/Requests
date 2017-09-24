@@ -23,6 +23,7 @@ public class CustomThread extends Thread {
         Client client = Client.getInstance();
         while (isWork) {
             client.updateQueue(new Request());
+            sleep();
         }
     }
 }
