@@ -2,35 +2,39 @@ package com.company.Server;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class ServerWorkThread extends Thread {
-    private boolean isWork = true;
-    private ServerSocket serverSocket;
+    private Socket clientSocket;
+    private boolean connected = true;
 
-    public ServerWorkThread(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
+    ServerWorkThread(Socket clientSocket) {
+        this.clientSocket = clientSocket;
     }
 
     @Override
     public void run() {
         try {
-            while (isWork) {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected...");
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
+            System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected...");
 
-                while (true){
-                    byte[] data = new byte[4];
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
-                    bufferedInputStream.read(data, 0, 4);
+            while (connected) {
+                byte[] data = new byte[4];
+                int numBytes = bufferedInputStream.read(data, 0, 4);
 
-                    ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-                    int value = byteBuffer.getInt();
-                    System.out.println(value);
+                if (numBytes == -1) {
+                    System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " disconnected...");
+                    connected = false;
+                    break;
                 }
+
+                ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+                int value = byteBuffer.getInt();
+                System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " | data = " + value);
             }
+            bufferedInputStream.close();
+            clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
