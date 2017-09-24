@@ -43,7 +43,7 @@ class Client {
                         outputStream.flush();
 
                         queue.remove(request);
-                        System.out.println("send " + value);
+                        System.out.println("send " + request.toString());
                     }
                 } finally {
                     locker.unlock();

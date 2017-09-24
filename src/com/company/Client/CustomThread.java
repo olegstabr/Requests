@@ -22,7 +22,9 @@ public class CustomThread extends Thread {
     public void run() {
         Client client = Client.getInstance();
         while (isWork) {
-            client.updateQueue(new Request());
+            Request request = new Request();
+            request.setMessage("Message from Thread #" + id);
+            client.updateQueue(request);
             sleep();
         }
     }
