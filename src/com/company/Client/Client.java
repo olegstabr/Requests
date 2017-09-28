@@ -27,6 +27,10 @@ class Client {
         }
     }
 
+    void receive() {
+        
+    }
+
     void send() {
         ReentrantLock locker = new ReentrantLock();
         try {
@@ -37,9 +41,7 @@ class Client {
 
                     while (!queue.isEmpty()) {
                         Request request = queue.get(0);
-                        byte[] data = request.getBytes();
-                        int value = request.getId();
-                        outputStream.write(data);
+                        outputStream.write(request.getBytes());
                         outputStream.flush();
 
                         queue.remove(request);
