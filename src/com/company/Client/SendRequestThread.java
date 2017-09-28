@@ -1,7 +1,5 @@
 package com.company.Client;
 
-import com.company.Data.Request;
-
 public class SendRequestThread extends Thread {
     private boolean isWork = true;
 
