@@ -1,7 +1,7 @@
 package com.company.Server;
 
 public class SendResponseThread extends Thread {
-    private boolean isWork = false;
+    private boolean isWork = true;
 
     public SendResponseThread() { }
 

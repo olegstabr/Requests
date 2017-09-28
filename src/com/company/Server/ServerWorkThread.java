@@ -10,14 +10,11 @@ import java.nio.ByteBuffer;
 
 public class ServerWorkThread extends Thread {
     private Socket clientSocket;
-    private SendResponseThread sendResponseThread;
     private boolean connected = true;
     private int bufferSize = 1024 * 8;
 
     ServerWorkThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        sendResponseThread = new SendResponseThread();
-        sendResponseThread.start();
     }
 
     @Override
@@ -39,16 +36,11 @@ public class ServerWorkThread extends Thread {
                 }
 
                 request = decodeMessage(data);
-                server.updateQueue(request);
-
-                if (!sendResponseThread.isWork()) {
-                    sendResponseThread.setWork(true);
-                }
+                server.updateQueue(clientSocket, request);
 
                 System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " | request = " + request.toString());
             }
             bufferedInputStream.close();
-            clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
