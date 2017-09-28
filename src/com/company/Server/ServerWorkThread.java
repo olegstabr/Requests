@@ -10,20 +10,25 @@ import java.nio.ByteBuffer;
 
 public class ServerWorkThread extends Thread {
     private Socket clientSocket;
+    private SendResponseThread sendResponseThread;
     private boolean connected = true;
     private int bufferSize = 1024 * 8;
 
     ServerWorkThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        sendResponseThread = new SendResponseThread();
+        sendResponseThread.start();
     }
 
     @Override
     public void run() {
         try {
+            Server server = Server.getInstance();
             BufferedInputStream bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
             System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " connected...");
 
             while (connected) {
+                Request request;
                 byte[] data = new byte[bufferSize];
                 int numBytes = bufferedInputStream.read(data);
 
@@ -33,7 +38,13 @@ public class ServerWorkThread extends Thread {
                     break;
                 }
 
-                Request request = decodeMessage(data);
+                request = decodeMessage(data);
+                server.updateQueue(request);
+
+                if (!sendResponseThread.isWork()) {
+                    sendResponseThread.setWork(true);
+                }
+
                 System.out.println(clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " | request = " + request.toString());
             }
             bufferedInputStream.close();
